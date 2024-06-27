@@ -51,6 +51,9 @@ pub struct XWinOptions {
     #[arg(long, env = "XWIN_VERSION", default_value = "16", hide = true)]
     pub xwin_version: String,
 
+    #[arg(long, env = "XWIN_SDK_VERSION", hide = true)]
+    pub xwin_sdk_version: Option<String>,
+
     /// Whether or not to include debug libs
     #[arg(long, env = "XWIN_INCLUDE_DEBUG_LIBS", hide = true)]
     pub xwin_include_debug_libs: bool,
@@ -64,6 +67,7 @@ impl Default for XWinOptions {
             xwin_variant: vec![xwin::Variant::Desktop],
             xwin_version: "16".to_string(),
             xwin_include_debug_libs: false,
+            xwin_sdk_version: None,
         }
     }
 }
@@ -292,7 +296,7 @@ impl XWinOptions {
             .xwin_variant
             .iter()
             .fold(0, |acc, var| acc | *var as u32);
-        let pruned = xwin::prune_pkg_list(&pkg_manifest, arches, variants, false, None, None)?;
+        let pruned = xwin::prune_pkg_list(&pkg_manifest, arches, variants, false, self.xwin_sdk_version.clone(), None)?;
         let op = xwin::Ops::Splat(xwin::SplatConfig {
             include_debug_libs: self.xwin_include_debug_libs,
             include_debug_symbols: false,
